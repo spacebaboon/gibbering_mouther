@@ -180,26 +180,20 @@ function playGibberingEffect() {
   wetGain.connect(reverbNode);
   reverbNode.connect(audioContext.destination);
 
-  // Spawn multiple voices
+  // Spawn multiple voices - all loop for continuous playback
   for (let i = 0; i < CONFIG.VOICE_COUNT; i++) {
     const delay = (Math.random() * CONFIG.STAGGER_MAX_MS) / 1000;
 
     setTimeout(() => {
-      createVoice(dryGain, wetGain);
+      createVoice(dryGain, wetGain, true); // true = continuous play
     }, delay * 1000);
   }
 
-  // Schedule re-enable of buttons after effect duration
-  setTimeout(() => {
-    updateStatus("Effect complete. Ready to play again!");
-    stopButton.style.display = "none";
-    playButton.style.display = "block";
-    playButton.disabled = false;
-    downloadButton.disabled = false;
-  }, CONFIG.EFFECT_DURATION_MS);
+  // Enable download button after initial voices start
+  downloadButton.disabled = false;
 }
 
-function createVoice(dryGain, wetGain) {
+function createVoice(dryGain, wetGain, continuous = false) {
   const source = audioContext.createBufferSource();
   source.buffer = recordedBuffer;
 
@@ -207,9 +201,13 @@ function createVoice(dryGain, wetGain) {
   source.playbackRate.value =
     CONFIG.PITCH_MIN + Math.random() * (CONFIG.PITCH_MAX - CONFIG.PITCH_MIN);
 
-  // Random looping
-  if (Math.random() < CONFIG.LOOP_PROBABILITY) {
+  // For continuous playback, always loop. For timed playback, use probability
+  if (continuous) {
     source.loop = true;
+  } else {
+    if (Math.random() < CONFIG.LOOP_PROBABILITY) {
+      source.loop = true;
+    }
   }
 
   // Random gain
@@ -226,8 +224,10 @@ function createVoice(dryGain, wetGain) {
   // Start playing
   source.start(audioContext.currentTime);
 
-  // Stop after effect duration
-  source.stop(audioContext.currentTime + CONFIG.EFFECT_DURATION_MS / 1000);
+  // Only schedule stop for non-continuous playback
+  if (!continuous) {
+    source.stop(audioContext.currentTime + CONFIG.EFFECT_DURATION_MS / 1000);
+  }
 
   currentPlayingSources.push(source);
 
