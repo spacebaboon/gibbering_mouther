@@ -36,6 +36,10 @@ const playButton = document.getElementById("playButton");
 const downloadButton = document.getElementById("downloadButton");
 const statusDisplay = document.getElementById("statusDisplay");
 
+// Config panel toggle
+const configHeader = document.getElementById("configHeader");
+const configGrid = document.getElementById("configGrid");
+
 // Config controls
 const voiceCountInput = document.getElementById("voiceCount");
 const voiceCountValue = document.getElementById("voiceCountValue");
@@ -419,6 +423,12 @@ playButton.addEventListener("click", () => {
 
 downloadButton.addEventListener("click", () => {
   downloadEffect();
+});
+
+// Config panel toggle
+configHeader.addEventListener("click", () => {
+  configHeader.classList.toggle("open");
+  configGrid.classList.toggle("open");
 });
 
 // Configuration control event listeners
