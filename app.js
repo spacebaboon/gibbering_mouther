@@ -9,7 +9,6 @@ const CONFIG = {
   STAGGER_MAX_MS: 800, // Maximum random delay before each voice starts
   GAIN_MIN: 0.3, // Minimum volume per voice
   GAIN_MAX: 1.0, // Maximum volume per voice
-  EFFECT_DURATION_MS: 15000, // Total duration of the effect (15 seconds)
   REVERB_WET_MIX: 0.5, // How much reverb to blend in
   LOOP_PROBABILITY: 0.3, // Probability that a voice will loop
 };
@@ -53,8 +52,6 @@ const gainMinInput = document.getElementById("gainMin");
 const gainMinValue = document.getElementById("gainMinValue");
 const gainMaxInput = document.getElementById("gainMax");
 const gainMaxValue = document.getElementById("gainMaxValue");
-const effectDurationInput = document.getElementById("effectDuration");
-const effectDurationValue = document.getElementById("effectDurationValue");
 const reverbMixInput = document.getElementById("reverbMix");
 const reverbMixValue = document.getElementById("reverbMixValue");
 const loopProbabilityInput = document.getElementById("loopProbability");
@@ -184,12 +181,12 @@ function playGibberingEffect() {
     const delay = (Math.random() * CONFIG.STAGGER_MAX_MS) / 1000;
 
     setTimeout(() => {
-      createVoice(dryGain, wetGain, true); // true = continuous play
+      createVoice(dryGain, wetGain);
     }, delay * 1000);
   }
 }
 
-function createVoice(dryGain, wetGain, continuous = false) {
+function createVoice(dryGain, wetGain) {
   const source = audioContext.createBufferSource();
   source.buffer = recordedBuffer;
 
@@ -197,14 +194,8 @@ function createVoice(dryGain, wetGain, continuous = false) {
   source.playbackRate.value =
     CONFIG.PITCH_MIN + Math.random() * (CONFIG.PITCH_MAX - CONFIG.PITCH_MIN);
 
-  // For continuous playback, always loop. For timed playback, use probability
-  if (continuous) {
-    source.loop = true;
-  } else {
-    if (Math.random() < CONFIG.LOOP_PROBABILITY) {
-      source.loop = true;
-    }
-  }
+  // All voices loop for continuous playback
+  source.loop = true;
 
   // Random gain
   const gainNode = audioContext.createGain();
@@ -219,11 +210,6 @@ function createVoice(dryGain, wetGain, continuous = false) {
 
   // Start playing
   source.start(audioContext.currentTime);
-
-  // Only schedule stop for non-continuous playback
-  if (!continuous) {
-    source.stop(audioContext.currentTime + CONFIG.EFFECT_DURATION_MS / 1000);
-  }
 
   currentPlayingSources.push(source);
 
@@ -325,12 +311,6 @@ gainMaxInput.addEventListener("input", (e) => {
   const value = parseFloat(e.target.value);
   CONFIG.GAIN_MAX = value;
   gainMaxValue.textContent = value.toFixed(1);
-});
-
-effectDurationInput.addEventListener("input", (e) => {
-  const value = parseInt(e.target.value);
-  CONFIG.EFFECT_DURATION_MS = value * 1000;
-  effectDurationValue.textContent = value;
 });
 
 reverbMixInput.addEventListener("input", (e) => {
