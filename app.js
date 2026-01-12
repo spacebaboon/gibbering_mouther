@@ -73,7 +73,7 @@ function initAudioContext() {
   reverbNode = audioContext.createConvolver();
   reverbNode.buffer = generateReverbImpulse();
 
-  updateStatus("Audio system initialized");
+  updateStatus("Audio system initialised", true);
 }
 
 function generateReverbImpulse() {
@@ -401,8 +401,13 @@ function writeString(view, offset, string) {
 // UI HELPERS
 // ============================================================================
 
-function updateStatus(message) {
+function updateStatus(message, isInitialized = false) {
   statusDisplay.textContent = message;
+  if (isInitialized) {
+    statusDisplay.classList.add("initialized");
+  } else {
+    statusDisplay.classList.remove("initialized");
+  }
 }
 
 // ============================================================================
