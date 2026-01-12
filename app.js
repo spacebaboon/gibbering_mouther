@@ -291,10 +291,12 @@ async function downloadEffect() {
     }
 
     // Render the audio
+    updateStatus("Rendering audio...");
     const renderedBuffer = await offlineContext.startRendering();
 
     // Convert to WAV and download
-    const wavBlob = bufferToWav(renderedBuffer);
+    updateStatus("Encoding WAV file...");
+    const wavBlob = await bufferToWav(renderedBuffer);
     const url = URL.createObjectURL(wavBlob);
 
     const a = document.createElement("a");
@@ -358,7 +360,7 @@ function createOfflineVoice(context, dryGain, wetGain, delay) {
   source.stop(delay + CONFIG.EFFECT_DURATION_MS / 1000);
 }
 
-function bufferToWav(buffer) {
+async function bufferToWav(buffer) {
   const numberOfChannels = buffer.numberOfChannels;
   const sampleRate = buffer.sampleRate;
   const length = buffer.length * numberOfChannels * 2;
@@ -381,14 +383,25 @@ function bufferToWav(buffer) {
   writeString(view, 36, "data");
   view.setUint32(40, length, true);
 
-  // Write PCM samples
+  // Write PCM samples in chunks to avoid freezing
   let offset = 44;
-  for (let i = 0; i < buffer.length; i++) {
-    for (let channel = 0; channel < numberOfChannels; channel++) {
-      const sample = buffer.getChannelData(channel)[i];
-      const int16 = Math.max(-1, Math.min(1, sample)) * 0x7fff;
-      view.setInt16(offset, int16, true);
-      offset += 2;
+  const chunkSize = 10000; // Process 10000 samples at a time
+
+  for (let i = 0; i < buffer.length; i += chunkSize) {
+    const end = Math.min(i + chunkSize, buffer.length);
+
+    for (let j = i; j < end; j++) {
+      for (let channel = 0; channel < numberOfChannels; channel++) {
+        const sample = buffer.getChannelData(channel)[j];
+        const int16 = Math.max(-1, Math.min(1, sample)) * 0x7fff;
+        view.setInt16(offset, int16, true);
+        offset += 2;
+      }
+    }
+
+    // Yield control back to browser every chunk
+    if (i + chunkSize < buffer.length) {
+      await new Promise(resolve => setTimeout(resolve, 0));
     }
   }
 
