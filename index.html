@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gibbering Mouther Voice Generator</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Gibbering Mouther</h1>
+        <p class="subtitle">Dungeon Master's tool for madness-inducing voices</p>
+
+        <div class="status-display" id="statusDisplay">
+            Ready to record
+        </div>
+
+        <div class="button-group">
+            <button id="recordButton" class="btn btn-primary">
+                Record Name
+            </button>
+            <button id="playButton" class="btn btn-secondary" disabled>
+                Play Gibbering Effect
+            </button>
+            <button id="downloadButton" class="btn btn-secondary" disabled>
+                Download Effect
+            </button>
+        </div>
+
+        <div class="instructions">
+            <h3>Instructions:</h3>
+            <ol>
+                <li>Click "Record Name" and speak a character's name</li>
+                <li>Click "Stop Recording" when done</li>
+                <li>Click "Play Gibbering Effect" to hear the madness</li>
+                <li>Optionally download the effect as a WAV file</li>
+            </ol>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
