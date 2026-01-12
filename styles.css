@@ -101,6 +101,15 @@ h1 {
   background-color: #5a8bb7;
 }
 
+.btn-stop {
+  background-color: #c54545;
+  color: white;
+}
+
+.btn-stop:hover {
+  background-color: #d55555;
+}
+
 .config-panel {
   margin-top: 2rem;
   padding: 1.5rem;

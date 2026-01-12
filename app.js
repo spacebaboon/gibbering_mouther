@@ -33,6 +33,7 @@ let generatedEffectBuffer = null;
 
 const recordButton = document.getElementById("recordButton");
 const playButton = document.getElementById("playButton");
+const stopButton = document.getElementById("stopButton");
 const downloadButton = document.getElementById("downloadButton");
 const statusDisplay = document.getElementById("statusDisplay");
 
@@ -165,7 +166,8 @@ function playGibberingEffect() {
   stopAllSources();
 
   updateStatus("Playing gibbering effect...");
-  playButton.disabled = true;
+  playButton.style.display = "none";
+  stopButton.style.display = "block";
 
   // Create dry/wet mix for reverb
   const dryGain = audioContext.createGain();
@@ -190,6 +192,8 @@ function playGibberingEffect() {
   // Schedule re-enable of buttons after effect duration
   setTimeout(() => {
     updateStatus("Effect complete. Ready to play again!");
+    stopButton.style.display = "none";
+    playButton.style.display = "block";
     playButton.disabled = false;
     downloadButton.disabled = false;
   }, CONFIG.EFFECT_DURATION_MS);
@@ -424,6 +428,15 @@ recordButton.addEventListener("click", () => {
 
 playButton.addEventListener("click", () => {
   playGibberingEffect();
+});
+
+stopButton.addEventListener("click", () => {
+  stopAllSources();
+  stopButton.style.display = "none";
+  playButton.style.display = "block";
+  playButton.disabled = false;
+  downloadButton.disabled = false;
+  updateStatus("Playback stopped. Ready to play again!");
 });
 
 downloadButton.addEventListener("click", () => {
