@@ -345,10 +345,8 @@ function createOfflineVoice(context, dryGain, wetGain, delay) {
   source.playbackRate.value =
     CONFIG.PITCH_MIN + Math.random() * (CONFIG.PITCH_MAX - CONFIG.PITCH_MIN);
 
-  // Random looping
-  if (Math.random() < CONFIG.LOOP_PROBABILITY) {
-    source.loop = true;
-  }
+  // Always loop for offline rendering to ensure layered effect
+  source.loop = true;
 
   // Random gain
   const gainNode = context.createGain();
