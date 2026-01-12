@@ -146,14 +146,20 @@ h1 {
 }
 
 .config-grid {
-  display: none;
+  display: grid;
   grid-template-columns: 1fr;
   gap: 1rem;
-  margin-top: 1rem;
+  margin-top: 0;
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  transition: max-height 0.5s ease, opacity 0.5s ease, margin-top 0.5s ease;
 }
 
 .config-grid.open {
-  display: grid;
+  max-height: 1000px;
+  opacity: 1;
+  margin-top: 1rem;
 }
 
 .config-item {
