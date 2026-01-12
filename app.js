@@ -36,6 +36,26 @@ const playButton = document.getElementById("playButton");
 const downloadButton = document.getElementById("downloadButton");
 const statusDisplay = document.getElementById("statusDisplay");
 
+// Config controls
+const voiceCountInput = document.getElementById("voiceCount");
+const voiceCountValue = document.getElementById("voiceCountValue");
+const pitchMinInput = document.getElementById("pitchMin");
+const pitchMinValue = document.getElementById("pitchMinValue");
+const pitchMaxInput = document.getElementById("pitchMax");
+const pitchMaxValue = document.getElementById("pitchMaxValue");
+const staggerMaxInput = document.getElementById("staggerMax");
+const staggerMaxValue = document.getElementById("staggerMaxValue");
+const gainMinInput = document.getElementById("gainMin");
+const gainMinValue = document.getElementById("gainMinValue");
+const gainMaxInput = document.getElementById("gainMax");
+const gainMaxValue = document.getElementById("gainMaxValue");
+const effectDurationInput = document.getElementById("effectDuration");
+const effectDurationValue = document.getElementById("effectDurationValue");
+const reverbMixInput = document.getElementById("reverbMix");
+const reverbMixValue = document.getElementById("reverbMixValue");
+const loopProbabilityInput = document.getElementById("loopProbability");
+const loopProbabilityValue = document.getElementById("loopProbabilityValue");
+
 // ============================================================================
 // AUDIO CONTEXT INITIALIZATION
 // ============================================================================
@@ -401,6 +421,61 @@ playButton.addEventListener("click", () => {
 
 downloadButton.addEventListener("click", () => {
   downloadEffect();
+});
+
+// Configuration control event listeners
+voiceCountInput.addEventListener("input", (e) => {
+  const value = parseInt(e.target.value);
+  CONFIG.VOICE_COUNT = value;
+  voiceCountValue.textContent = value;
+});
+
+pitchMinInput.addEventListener("input", (e) => {
+  const value = parseFloat(e.target.value);
+  CONFIG.PITCH_MIN = value;
+  pitchMinValue.textContent = value.toFixed(1);
+});
+
+pitchMaxInput.addEventListener("input", (e) => {
+  const value = parseFloat(e.target.value);
+  CONFIG.PITCH_MAX = value;
+  pitchMaxValue.textContent = value.toFixed(1);
+});
+
+staggerMaxInput.addEventListener("input", (e) => {
+  const value = parseInt(e.target.value);
+  CONFIG.STAGGER_MAX_MS = value;
+  staggerMaxValue.textContent = value;
+});
+
+gainMinInput.addEventListener("input", (e) => {
+  const value = parseFloat(e.target.value);
+  CONFIG.GAIN_MIN = value;
+  gainMinValue.textContent = value.toFixed(1);
+});
+
+gainMaxInput.addEventListener("input", (e) => {
+  const value = parseFloat(e.target.value);
+  CONFIG.GAIN_MAX = value;
+  gainMaxValue.textContent = value.toFixed(1);
+});
+
+effectDurationInput.addEventListener("input", (e) => {
+  const value = parseInt(e.target.value);
+  CONFIG.EFFECT_DURATION_MS = value * 1000;
+  effectDurationValue.textContent = value;
+});
+
+reverbMixInput.addEventListener("input", (e) => {
+  const value = parseFloat(e.target.value);
+  CONFIG.REVERB_WET_MIX = value;
+  reverbMixValue.textContent = value.toFixed(1);
+});
+
+loopProbabilityInput.addEventListener("input", (e) => {
+  const value = parseFloat(e.target.value);
+  CONFIG.LOOP_PROBABILITY = value;
+  loopProbabilityValue.textContent = value.toFixed(1);
 });
 
 // ============================================================================

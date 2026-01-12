@@ -27,6 +27,65 @@
             </button>
         </div>
 
+        <div class="config-panel">
+            <h3>Configuration</h3>
+            <div class="config-grid">
+                <div class="config-item">
+                    <label for="voiceCount">Voice Count:</label>
+                    <input type="number" id="voiceCount" min="1" max="100" value="40">
+                    <span class="config-value" id="voiceCountValue">40</span>
+                </div>
+
+                <div class="config-item">
+                    <label for="pitchMin">Pitch Min:</label>
+                    <input type="range" id="pitchMin" min="0.1" max="1.5" step="0.1" value="0.2">
+                    <span class="config-value" id="pitchMinValue">0.2</span>
+                </div>
+
+                <div class="config-item">
+                    <label for="pitchMax">Pitch Max:</label>
+                    <input type="range" id="pitchMax" min="0.5" max="3.0" step="0.1" value="1.5">
+                    <span class="config-value" id="pitchMaxValue">1.5</span>
+                </div>
+
+                <div class="config-item">
+                    <label for="staggerMax">Stagger Max (ms):</label>
+                    <input type="range" id="staggerMax" min="0" max="2000" step="50" value="800">
+                    <span class="config-value" id="staggerMaxValue">800</span>
+                </div>
+
+                <div class="config-item">
+                    <label for="gainMin">Volume Min:</label>
+                    <input type="range" id="gainMin" min="0.1" max="0.9" step="0.1" value="0.3">
+                    <span class="config-value" id="gainMinValue">0.3</span>
+                </div>
+
+                <div class="config-item">
+                    <label for="gainMax">Volume Max:</label>
+                    <input type="range" id="gainMax" min="0.5" max="1.0" step="0.1" value="1.0">
+                    <span class="config-value" id="gainMaxValue">1.0</span>
+                </div>
+
+                <div class="config-item">
+                    <label for="effectDuration">Effect Duration (s):</label>
+                    <input type="range" id="effectDuration" min="5" max="30" step="1" value="15">
+                    <span class="config-value" id="effectDurationValue">15</span>
+                </div>
+
+                <div class="config-item">
+                    <label for="reverbMix">Reverb Mix:</label>
+                    <input type="range" id="reverbMix" min="0" max="1" step="0.1" value="0.5">
+                    <span class="config-value" id="reverbMixValue">0.5</span>
+                </div>
+
+                <div class="config-item">
+                    <label for="loopProbability">Loop Probability:</label>
+                    <input type="range" id="loopProbability" min="0" max="1" step="0.1" value="0.3">
+                    <span class="config-value" id="loopProbabilityValue">0.3</span>
+                </div>
+            </div>
+        </div>
+
         <div class="instructions">
             <h3>Instructions:</h3>
             <ol>

@@ -106,6 +106,86 @@ h1 {
     cursor: not-allowed;
 }
 
+.config-panel {
+    margin-top: 2rem;
+    padding: 1.5rem;
+    background: rgba(0, 100, 0, 0.1);
+    border: 1px solid #2d5016;
+    border-radius: 8px;
+}
+
+.config-panel h3 {
+    margin-top: 0;
+    margin-bottom: 1rem;
+    color: #4a9d2c;
+}
+
+.config-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+}
+
+.config-item {
+    display: grid;
+    grid-template-columns: 150px 1fr 60px;
+    align-items: center;
+    gap: 10px;
+}
+
+.config-item label {
+    color: #aaa;
+    font-size: 0.9em;
+}
+
+.config-item input[type="range"],
+.config-item input[type="number"] {
+    width: 100%;
+    cursor: pointer;
+}
+
+.config-item input[type="range"] {
+    height: 6px;
+    background: #333;
+    border-radius: 3px;
+    outline: none;
+}
+
+.config-item input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 16px;
+    height: 16px;
+    background: #4a9d2c;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+.config-item input[type="range"]::-moz-range-thumb {
+    width: 16px;
+    height: 16px;
+    background: #4a9d2c;
+    border-radius: 50%;
+    cursor: pointer;
+    border: none;
+}
+
+.config-item input[type="number"] {
+    background: #2a2a2a;
+    border: 1px solid #444;
+    color: #e0e0e0;
+    padding: 5px;
+    border-radius: 4px;
+    font-family: inherit;
+}
+
+.config-value {
+    color: #4a9d2c;
+    font-family: monospace;
+    font-weight: bold;
+    text-align: right;
+}
+
 .instructions {
     margin-top: 2rem;
     padding: 1.5rem;
