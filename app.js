@@ -302,9 +302,15 @@ async function downloadEffect() {
     const a = document.createElement("a");
     a.href = url;
     a.download = "gibbering_mouther.wav";
+    a.style.display = "none";
+    document.body.appendChild(a);
     a.click();
 
-    URL.revokeObjectURL(url);
+    // Clean up after download starts
+    setTimeout(() => {
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }, 100);
 
     updateStatus("Effect downloaded successfully!");
   } catch (error) {
