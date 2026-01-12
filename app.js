@@ -63,9 +63,7 @@ const loopProbabilityValue = document.getElementById("loopProbabilityValue");
 function initAudioContext() {
   if (audioContext) return;
 
-  // Handle webkit prefix for older Safari
-  const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-  audioContext = new AudioContextClass();
+  audioContext = new AudioContext();
 
   // Generate reverb impulse response
   reverbNode = audioContext.createConvolver();
