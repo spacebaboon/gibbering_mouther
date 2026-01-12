@@ -34,7 +34,6 @@ let generatedEffectBuffer = null;
 const recordButton = document.getElementById("recordButton");
 const playButton = document.getElementById("playButton");
 const stopButton = document.getElementById("stopButton");
-const downloadButton = document.getElementById("downloadButton");
 const statusDisplay = document.getElementById("statusDisplay");
 
 // Config panel toggle
@@ -188,9 +187,6 @@ function playGibberingEffect() {
       createVoice(dryGain, wetGain, true); // true = continuous play
     }, delay * 1000);
   }
-
-  // Enable download button after initial voices start
-  downloadButton.disabled = false;
 }
 
 function createVoice(dryGain, wetGain, continuous = false) {
@@ -252,173 +248,6 @@ function stopAllSources() {
 }
 
 // ============================================================================
-// WAV ENCODING AND DOWNLOAD
-// ============================================================================
-
-async function downloadEffect() {
-  if (!recordedBuffer) return;
-
-  updateStatus("Generating effect for download...");
-  downloadButton.disabled = true;
-
-  try {
-    // Create offline context for rendering
-    const offlineContext = new OfflineAudioContext(
-      2, // stereo
-      (audioContext.sampleRate * CONFIG.EFFECT_DURATION_MS) / 1000,
-      audioContext.sampleRate
-    );
-
-    // Create reverb for offline context
-    const offlineReverb = offlineContext.createConvolver();
-    offlineReverb.buffer = generateOfflineReverbImpulse(offlineContext);
-
-    // Create dry/wet mix
-    const dryGain = offlineContext.createGain();
-    const wetGain = offlineContext.createGain();
-
-    dryGain.gain.value = 1 - CONFIG.REVERB_WET_MIX;
-    wetGain.gain.value = CONFIG.REVERB_WET_MIX;
-
-    dryGain.connect(offlineContext.destination);
-    wetGain.connect(offlineReverb);
-    offlineReverb.connect(offlineContext.destination);
-
-    // Create all voices with same random parameters
-    for (let i = 0; i < CONFIG.VOICE_COUNT; i++) {
-      const delay = (Math.random() * CONFIG.STAGGER_MAX_MS) / 1000;
-      createOfflineVoice(offlineContext, dryGain, wetGain, delay);
-    }
-
-    // Render the audio
-    updateStatus("Rendering audio...");
-    const renderedBuffer = await offlineContext.startRendering();
-
-    // Convert to WAV and download
-    updateStatus("Encoding WAV file...");
-    const wavBlob = await bufferToWav(renderedBuffer);
-    const url = URL.createObjectURL(wavBlob);
-
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "gibbering_mouther.wav";
-    a.style.display = "none";
-    document.body.appendChild(a);
-    a.click();
-
-    // Clean up after download starts
-    setTimeout(() => {
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-    }, 100);
-
-    updateStatus("Effect downloaded successfully!");
-  } catch (error) {
-    console.error("Error generating download:", error);
-    updateStatus("Error generating download");
-  } finally {
-    downloadButton.disabled = false;
-  }
-}
-
-function generateOfflineReverbImpulse(context) {
-  const sampleRate = context.sampleRate;
-  const length = sampleRate * 2;
-  const impulse = context.createBuffer(2, length, sampleRate);
-
-  for (let channel = 0; channel < 2; channel++) {
-    const channelData = impulse.getChannelData(channel);
-    for (let i = 0; i < length; i++) {
-      const decay = Math.exp(-i / (sampleRate * 0.5));
-      channelData[i] = (Math.random() * 2 - 1) * decay;
-    }
-  }
-
-  return impulse;
-}
-
-function createOfflineVoice(context, dryGain, wetGain, delay) {
-  const source = context.createBufferSource();
-  source.buffer = recordedBuffer;
-
-  // Random pitch
-  source.playbackRate.value =
-    CONFIG.PITCH_MIN + Math.random() * (CONFIG.PITCH_MAX - CONFIG.PITCH_MIN);
-
-  // Always loop for offline rendering to ensure layered effect
-  source.loop = true;
-
-  // Random gain
-  const gainNode = context.createGain();
-  const gainValue =
-    CONFIG.GAIN_MIN + Math.random() * (CONFIG.GAIN_MAX - CONFIG.GAIN_MIN);
-  gainNode.gain.value = gainValue;
-
-  // Connect to both dry and wet paths
-  source.connect(gainNode);
-  gainNode.connect(dryGain);
-  gainNode.connect(wetGain);
-
-  // Start with delay
-  source.start(delay);
-  source.stop(delay + CONFIG.EFFECT_DURATION_MS / 1000);
-}
-
-async function bufferToWav(buffer) {
-  const numberOfChannels = buffer.numberOfChannels;
-  const sampleRate = buffer.sampleRate;
-  const length = buffer.length * numberOfChannels * 2;
-
-  const arrayBuffer = new ArrayBuffer(44 + length);
-  const view = new DataView(arrayBuffer);
-
-  // Write WAV header
-  writeString(view, 0, "RIFF");
-  view.setUint32(4, 36 + length, true);
-  writeString(view, 8, "WAVE");
-  writeString(view, 12, "fmt ");
-  view.setUint32(16, 16, true); // PCM format
-  view.setUint16(20, 1, true); // PCM
-  view.setUint16(22, numberOfChannels, true);
-  view.setUint32(24, sampleRate, true);
-  view.setUint32(28, sampleRate * numberOfChannels * 2, true); // byte rate
-  view.setUint16(32, numberOfChannels * 2, true); // block align
-  view.setUint16(34, 16, true); // bits per sample
-  writeString(view, 36, "data");
-  view.setUint32(40, length, true);
-
-  // Write PCM samples in chunks to avoid freezing
-  let offset = 44;
-  const chunkSize = 10000; // Process 10000 samples at a time
-
-  for (let i = 0; i < buffer.length; i += chunkSize) {
-    const end = Math.min(i + chunkSize, buffer.length);
-
-    for (let j = i; j < end; j++) {
-      for (let channel = 0; channel < numberOfChannels; channel++) {
-        const sample = buffer.getChannelData(channel)[j];
-        const int16 = Math.max(-1, Math.min(1, sample)) * 0x7fff;
-        view.setInt16(offset, int16, true);
-        offset += 2;
-      }
-    }
-
-    // Yield control back to browser every chunk
-    if (i + chunkSize < buffer.length) {
-      await new Promise(resolve => setTimeout(resolve, 0));
-    }
-  }
-
-  return new Blob([arrayBuffer], { type: "audio/wav" });
-}
-
-function writeString(view, offset, string) {
-  for (let i = 0; i < string.length; i++) {
-    view.setUint8(offset + i, string.charCodeAt(i));
-  }
-}
-
-// ============================================================================
 // UI HELPERS
 // ============================================================================
 
@@ -452,12 +281,7 @@ stopButton.addEventListener("click", () => {
   stopButton.style.display = "none";
   playButton.style.display = "block";
   playButton.disabled = false;
-  downloadButton.disabled = false;
   updateStatus("Playback stopped. Ready to play again!");
-});
-
-downloadButton.addEventListener("click", () => {
-  downloadEffect();
 });
 
 // Config panel toggle
